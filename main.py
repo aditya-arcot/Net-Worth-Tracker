@@ -2,9 +2,15 @@ import os
 from datetime import datetime
 import json
 import matplotlib.pyplot as plt
+import locale
 
 data_filename = "data.json"
-main_options = ["Add data point", "Create graphs", "Exit"]
+main_options = [
+    "Add data point",
+    "Create graphs",
+    "Calculate current net worth",
+    "Exit",
+]
 account_selection_options = ["Select a tracked account", "Add a new account"]
 
 
@@ -85,14 +91,14 @@ def addDataPoint():
         json.dump(data, f, ensure_ascii=False, indent=4)
 
 
-def createGraphs():
+def parseAccountsData():
     if not os.path.exists(data_filename):
         print("Add some data and try again\n")
         return
-    
+
     with open(data_filename) as f:
         data = json.load(f)
-    
+
     dates = set()
     accounts_data = {}
 
@@ -109,36 +115,64 @@ def createGraphs():
                 prev_balance = balances[date.strftime("%Y-%m-%d")]
             accounts_data[account].append((date, prev_balance))
 
-    plt.figure(dpi=300, figsize=(15, 7.5))
-    for account, balances in accounts_data.items():
-        dates, values = zip(*sorted(balances))
-        plt.plot(dates, values, label=account)
-    plt.xlabel('Date')
-    plt.ylabel('Balance')
-    plt.title('Account Balances')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig('account_balances')
-    plt.close()
+    return dates, accounts_data
 
+
+def calculateRunningTotals(dates, accounts_data):
     running_totals = {}
     for date in dates:
         running_totals[date] = 0
-        for account, balances in accounts_data.items():
+        for _, balances in accounts_data.items():
             for _date, balance in balances:
                 if _date == date:
                     running_totals[date] += balance
                     break
-    dates, values = zip(*sorted(running_totals.items()))
+    _, values = zip(*sorted(running_totals.items()))
+    return values
+
+
+def createGraphs():
+    try:
+        dates, accounts_data = parseAccountsData()
+    except TypeError:
+        return
     plt.figure(dpi=300, figsize=(15, 7.5))
-    plt.plot(dates, values)
-    plt.xlabel('Date')
-    plt.ylabel('Value')
-    plt.title('Net Worth')
+    for account, balances in accounts_data.items():
+        _dates, _values = zip(*sorted(balances))
+        plt.plot(_dates, _values, label=account)
+    plt.xlabel("Date")
+    plt.ylabel("Balance")
+    plt.title("Account Balances")
+    plt.legend()
     plt.tight_layout()
-    plt.savefig('net_worth')
+    plt.savefig("account_balances")
     plt.close()
 
+    values = calculateRunningTotals(dates, accounts_data)
+    plt.figure(dpi=300, figsize=(15, 7.5))
+    plt.plot(dates, values)
+    plt.xlabel("Date")
+    plt.ylabel("Value")
+    plt.title("Net Worth")
+    plt.tight_layout()
+    plt.savefig("net_worth")
+    plt.close()
+
+
+def calcNetWorth():
+    try:
+        dates, accounts_data = parseAccountsData()
+    except TypeError:
+        return
+    values = calculateRunningTotals(dates, accounts_data)
+    if values is None:
+        print()
+        return
+
+    print(f"Current net worth: {locale.currency(values[-1], grouping=True)}\n")
+
+
+locale.setlocale(locale.LC_ALL, "")
 while True:
     match parseOption(main_options):
         case 0:
@@ -146,4 +180,6 @@ while True:
         case 1:
             createGraphs()
         case 2:
+            calcNetWorth()
+        case 3:
             exit("Bye")
