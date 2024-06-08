@@ -37,14 +37,14 @@ def parseFloat():
     while True:
         try:
             val = float(
-                input("Enter a number: ").replace("$", "").replace(",", "").strip()
+                input("Enter a currency amount: ").replace("$", "").replace(",", "").strip()
             )
             return val
         except KeyboardInterrupt:
             print("\nBye")
             exit()
         except ValueError:
-            print("Not a number, try again")
+            print("Not a currency amount, try again")
 
 
 def addAccount():
