@@ -3,12 +3,13 @@ from datetime import datetime
 import json
 import matplotlib.pyplot as plt
 import locale
+import csv
 from matplotlib.ticker import FuncFormatter
 
 data_filename = "data.json"
 main_options = [
     "Add data point",
-    "Create graphs",
+    "Create table and graphs",
     "Calculate current net worth",
     "Exit",
 ]
@@ -139,7 +140,7 @@ def format_label(val, _):
     return f"${val/1000:,.0f}k"
 
 
-def createGraphs():
+def createTableAndGraphs():
     try:
         dates, accounts_data = parseAccountsData()
     except TypeError:
@@ -169,6 +170,19 @@ def createGraphs():
     plt.savefig("net_worth")
     plt.close()
 
+    with open("net_worth_history.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Year", "Month", "Day", "Net Worth"])
+        for i in range(len(dates)):
+            writer.writerow(
+                [
+                    dates[i].year,
+                    dates[i].month,
+                    dates[i].day,
+                    "${0:,.2f}".format(values[i]),
+                ]
+            )
+
 
 def calcNetWorth():
     try:
@@ -189,7 +203,7 @@ while True:
         case 0:
             addDataPoint()
         case 1:
-            createGraphs()
+            createTableAndGraphs()
         case 2:
             calcNetWorth()
         case 3:
