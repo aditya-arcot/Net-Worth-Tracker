@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import matplotlib.pyplot as plt
 import locale
+from matplotlib.ticker import FuncFormatter
 
 data_filename = "data.json"
 main_options = [
@@ -37,7 +38,10 @@ def parseFloat():
     while True:
         try:
             val = float(
-                input("Enter a currency amount: ").replace("$", "").replace(",", "").strip()
+                input("Enter a currency amount: ")
+                .replace("$", "")
+                .replace(",", "")
+                .strip()
             )
             return val
         except KeyboardInterrupt:
@@ -131,6 +135,10 @@ def calculateRunningTotals(dates, accounts_data):
     return values
 
 
+def format_label(val, _):
+    return f"${val/1000:,.0f}k"
+
+
 def createGraphs():
     try:
         dates, accounts_data = parseAccountsData()
@@ -151,6 +159,9 @@ def createGraphs():
     values = calculateRunningTotals(dates, accounts_data)
     plt.figure(dpi=300, figsize=(15, 7.5))
     plt.plot(dates, values)
+    ax = plt.gca()
+    formatter = FuncFormatter(format_label)
+    ax.yaxis.set_major_formatter(formatter)
     plt.xlabel("Date")
     plt.ylabel("Value")
     plt.title("Net Worth")
