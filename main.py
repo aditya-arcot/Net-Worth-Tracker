@@ -1,9 +1,10 @@
+import csv
+import json
+import locale
 import os
 from datetime import datetime
-import json
+
 import matplotlib.pyplot as plt
-import locale
-import csv
 from matplotlib.ticker import FuncFormatter
 
 data_filename = "data.json"
@@ -172,14 +173,27 @@ def createTableAndGraphs():
 
     with open("net_worth_history.csv", "w") as f:
         writer = csv.writer(f)
-        writer.writerow(["Year", "Month", "Day", "Net Worth"])
+        writer.writerow(
+            [
+                "Year",
+                "Month",
+                "Day",
+                "Net Worth",
+                "Elapsed Days",
+                "Raw Net Worth (in thousands)",
+            ]
+        )
+        start_date = dates[0]
         for i in range(len(dates)):
+            elapsed_days = (dates[i] - start_date).days
             writer.writerow(
                 [
                     dates[i].year,
                     dates[i].month,
                     dates[i].day,
                     "${0:,.2f}".format(values[i]),
+                    elapsed_days,
+                    "{0:.2f}".format(values[i] / 1000),
                 ]
             )
 
