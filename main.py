@@ -29,6 +29,7 @@ def parseOption(options):
             if val < 0 or val >= len(options):
                 print("Not in range, try again")
                 continue
+            print()
             return val
         except KeyboardInterrupt:
             exit("\nBye")
@@ -36,15 +37,13 @@ def parseOption(options):
             print("Not an integer, try again")
 
 
-def parseFloat():
+def parseAccountValue():
     while True:
         try:
             val = float(
-                input("Enter a currency amount: ")
-                .replace("$", "")
-                .replace(",", "")
-                .strip()
+                input("Enter account value: ").replace("$", "").replace(",", "").strip()
             )
+            print()
             return val
         except KeyboardInterrupt:
             print("\nBye")
@@ -54,7 +53,9 @@ def parseFloat():
 
 
 def addAccount():
-    return input("Enter account name: ")
+    name = input("Enter account name: ")
+    print()
+    return name
 
 
 def addDataPoint():
@@ -76,14 +77,13 @@ def addDataPoint():
     else:
         account = addAccount()
 
-    print("Enter account value")
-    value = parseFloat()
+    value = parseAccountValue()
 
     if account not in data.keys():
         data[account] = {}
 
     if date in data[account]:
-        print("Data already exists. Select which  to use")
+        print("Data already exists. Select which to keep")
         options = [f"existing - {data[account][date]}", f"new - {value}"]
         match parseOption(options):
             case 0:
