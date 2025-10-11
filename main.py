@@ -142,6 +142,8 @@ def format_label(val, _):
 
 
 def createTableAndGraphs():
+    formatter = FuncFormatter(format_label)
+
     try:
         dates, accounts_data = parseAccountsData()
     except TypeError:
@@ -150,6 +152,8 @@ def createTableAndGraphs():
     for account, balances in accounts_data.items():
         _dates, _values = zip(*sorted(balances))
         plt.plot(_dates, _values, label=account)
+    ax = plt.gca()
+    ax.yaxis.set_major_formatter(formatter)
     plt.xlabel("Date")
     plt.ylabel("Balance")
     plt.title("Account Balances")
@@ -162,7 +166,6 @@ def createTableAndGraphs():
     plt.figure(dpi=300, figsize=(15, 7.5))
     plt.plot(dates, values)
     ax = plt.gca()
-    formatter = FuncFormatter(format_label)
     ax.yaxis.set_major_formatter(formatter)
     plt.xlabel("Date")
     plt.ylabel("Value")
