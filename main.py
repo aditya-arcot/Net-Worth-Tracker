@@ -138,7 +138,7 @@ def calculateRunningTotals(dates, accounts_data):
 
 
 def format_label(val, _):
-    return f"${val/1000:,.0f}k"
+    return f"${val / 1000:,.0f}k"
 
 
 def createTableAndGraphs():
